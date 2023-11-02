@@ -18,7 +18,7 @@ func newDeployment(resource *crdappsv1.Book) appsv1.Deployment {
 	}
 	return appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      resource.Spec.DeploymentName + "-controller",
+			Name:      resource.Spec.DeploymentName,
 			Namespace: resource.Namespace,
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -55,5 +55,6 @@ func trimTheOwnerPartFromImageName(s string) string {
 	if len(arr) == 1 {
 		return arr[0]
 	}
-	return arr[1]
+	arr = strings.Split(arr[1], ":")
+	return arr[0]
 }

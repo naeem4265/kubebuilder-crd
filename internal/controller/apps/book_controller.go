@@ -62,9 +62,10 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 	// Load the book by name
 	// TODO(user): your logic here
+	fmt.Printf("\n\nReconfile called-----------------------\n\n")
 	var book crdappsv1.Book
 	if err := r.Get(ctx, req.NamespacedName, &book); err != nil {
-		log.Error(err, "Unable to fetch book")
+		log.Error(err, "Unable to fetch book, you can ignore it")
 		// We'll ignore not-found errors, since they can't be fixed by an immediate requeue
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -101,12 +102,16 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	}
 
 	// Same for service.
+	srvName := types.NamespacedName{
+		Namespace: req.Namespace,
+		Name:      book.Spec.Service.Name,
+	}
 	var srv corev1.Service
-	if err := r.Get(ctx, depName, &srv); err != nil {
+	if err := r.Get(ctx, srvName, &srv); err != nil {
 		if !errors.IsNotFound(err) {
 			return ctrl.Result{}, err
 		}
-		// if no Service found , or found deployments are not owned by book, create one on the cluster
+		// if no Service found , or found service are not owned by book, create one on the cluster
 		srv := customService(&book)
 		if err := r.Create(ctx, &srv); err != nil {
 			log.Error(err, "Unable to create Service")
@@ -115,49 +120,13 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		fmt.Println("Created Service successfully")
 	}
 
-	fmt.Println("Reconcile done")
+	fmt.Println("Reconcile done----------------------")
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *BookReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	/*
-		// Did not use.
-		if err := mgr.GetFieldIndexer().IndexField(context.Background(), &appsv1.Deployment{}, depOwnerKey, func(rawObj client.Object) []string {
-			// grab the deploy object, extract the owner...
-			deploy := rawObj.(*appsv1.Deployment)
-			owner := metav1.GetControllerOf(deploy)
-			if owner == nil {
-				return nil
-			}
-			// ...make sure it's a Nicedeploy...
-			if owner.APIVersion != apiGVStr || owner.Kind != "Neymar" {
-				return nil
-			}
-
-			// ...and if so, return it
-			return []string{owner.Name}
-		}); err != nil {
-			return err
-		}
-
-		if err := mgr.GetFieldIndexer().IndexField(context.Background(), &corev1.Service{}, svcOwnerKey, func(rawObj client.Object) []string {
-			// grab the service object, extract the owner...
-			svc := rawObj.(*corev1.Service)
-			owner := metav1.GetControllerOf(svc)
-			if owner == nil {
-				return nil
-			}
-			if owner.APIVersion != apiGVStr || owner.Kind != "Neymar" {
-				return nil
-			}
-			// ...and if so, return it
-			return []string{owner.Name}
-		}); err != nil {
-			return err
-		}
-	*/
-	fmt.Println("SetupWithManager successful. ")
+	fmt.Println("SetupWithManager successful.-----------------------------")
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&crdappsv1.Book{}).
 		// Watch deployment and if owner of this deployment is book, then call Reconcile.

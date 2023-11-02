@@ -19,7 +19,7 @@ func customService(resource *crdappsv1.Book) corev1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      resource.Spec.Service.Name + "-service",
+			Name:      resource.Spec.Service.Name,
 			Namespace: resource.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(resource, crdappsv1.GroupVersion.WithKind("Book")),
@@ -32,7 +32,6 @@ func customService(resource *crdappsv1.Book) corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       resource.Spec.Container.Port,
 					TargetPort: intstr.FromInt32(resource.Spec.Container.Port),
-					NodePort:   30007,
 				},
 			},
 			Type: getTheServiceType(resource.Spec.Service.ServiceType),
