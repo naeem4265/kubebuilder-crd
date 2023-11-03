@@ -32,8 +32,7 @@ type ContainerSpec struct {
 type BookSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	// +optional
-	DeploymentName string `json:"deploymentName,omitempty"`
+	DeploymentName string `json:"deploymentName"`
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	// DeploymentName represents the name of the deployment we will create using CustomCrd
@@ -49,6 +48,7 @@ type BookSpec struct {
 // BookStatus defines the observed state of Book
 type BookStatus struct {
 	AvailableReplicas int32 `json:"availableReplicas"`
+	ServiceCreated    bool  `json:"serviceCreated"`
 }
 
 //+kubebuilder:object:root=true
@@ -80,7 +80,7 @@ func init() {
 type ServiceSpec struct {
 	Name string `json:"name"`
 	// +optional
-	ServiceType string `json:"serviceType"`
+	ServiceType string `json:"serviceType,omitempty"`
 	ServicePort int32  `json:"servicePort"`
 	// +optional
 	ServiceNodePort int32 `json:"serviceNodePort,omitempty"`

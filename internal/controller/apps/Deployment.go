@@ -17,11 +17,16 @@ func newDeployment(resource *crdappsv1.Book) appsv1.Deployment {
 		"controller": resource.Name,
 	}
 	return appsv1.Deployment{
-		// TODO : Check if the required fields are empty or not
-		// TODO: Owner Ref
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Deployment",
+			APIVersion: "v1",
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      resource.Spec.DeploymentName,
 			Namespace: resource.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(resource, crdappsv1.GroupVersion.WithKind("Book")),
+			},
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: resource.Spec.Replicas,

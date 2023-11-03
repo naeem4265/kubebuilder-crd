@@ -7,7 +7,7 @@ spec:
     image: "naeem4265/api-server:1.0.4"
     port: 8080
   deploymentName: book-deployment
-  replicas: 4
+  replicas: 2
   service:
     name: book-service
     servicePort: 8080

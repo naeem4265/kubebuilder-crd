@@ -55,7 +55,7 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	log := log.FromContext(ctx)
 
 	// Load the book by name
-	fmt.Printf("Reconfile called\n")
+	fmt.Println("--------------Reconfile called--------------------")
 	var book crdappsv1.Book
 	if err := r.Get(ctx, req.NamespacedName, &book); err != nil {
 		log.Error(err, "Unable to fetch book, you can ignore it")
@@ -75,12 +75,12 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 		// TODO : Don't redeclare var names in same scope
 		// if no Deployment found , or found deployments are not owned by book, create one on the cluster
-		newdeploy := newDeployment(&book)
-		if err := r.Create(ctx, &newdeploy); err != nil {
+		deploy = newDeployment(&book)
+		if err := r.Create(ctx, &deploy); err != nil {
 			log.Error(err, "Unable to create deployment")
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
-		fmt.Printf("\nCreated deployment successfully\n")
+		fmt.Println("Created deployment successfully")
 	} else {
 		// update deployment status if exist
 		if *deploy.Spec.Replicas != *book.Spec.Replicas {
@@ -112,17 +112,22 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 			log.Error(err, "Unable to create Service")
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
+		// Update the Book's Status field to indicate that a Service has been created.
+		book.Status.ServiceCreated = true
+		if err := r.Status().Update(ctx, &book); err != nil {
+			log.Error(err, "Unable to update Book's ServiceCreated Status")
+			return ctrl.Result{}, err
+		}
 		fmt.Println("Created Service successfully")
 	}
-	// Add a field in book.Status to hold info about svc creation
 
-	fmt.Println("Reconcile done----------------------")
+	fmt.Println("--------------------Reconcile done----------------------")
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *BookReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	fmt.Println("SetupWithManager successful.-----------------------------")
+	fmt.Println("SetupWithManager successful")
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&crdappsv1.Book{}).
 		// Watch deployment and if owner of this deployment is book, then call Reconcile.

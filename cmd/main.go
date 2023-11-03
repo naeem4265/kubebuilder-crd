@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -100,7 +99,7 @@ func main() {
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
-	fmt.Println("controller started----------")
+	setupLog.Info("Controller Created successfully")
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
@@ -111,7 +110,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	setupLog.Info("Starting manager--------------------------------")
+	setupLog.Info("Starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
