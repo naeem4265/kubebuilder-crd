@@ -10,6 +10,8 @@
 ### Edit internal/controller/apps/book_controller.go file.
 ### Generate manifests
     $ make manifests
+### Install CRD of Custom Resources
+    $ kubectl apply -k config/crd/bases/
 ### Install the CRDs into the cluster.
     $ make install
     $ make run
