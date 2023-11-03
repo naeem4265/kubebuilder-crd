@@ -15,7 +15,7 @@ func customService(resource *crdappsv1.Book) corev1.Service {
 	}
 	service := corev1.Service{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "service",
+			Kind:       "Service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{

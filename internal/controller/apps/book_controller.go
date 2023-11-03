@@ -32,12 +32,6 @@ import (
 	crdappsv1 "github.com/naeem4265/kubebuilder-crd/api/apps/v1"
 )
 
-var (
-	depOwnerKey = ".metadata.controller"
-	svcOwnerKey = ".metadata.controller"
-	apiGVStr    = crdappsv1.GroupVersion.String()
-)
-
 // BookReconciler reconciles a Book object
 type BookReconciler struct {
 	client.Client
@@ -61,8 +55,7 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	log := log.FromContext(ctx)
 
 	// Load the book by name
-	// TODO(user): your logic here
-	fmt.Printf("\n\nReconfile called-----------------------\n\n")
+	fmt.Printf("Reconfile called\n")
 	var book crdappsv1.Book
 	if err := r.Get(ctx, req.NamespacedName, &book); err != nil {
 		log.Error(err, "Unable to fetch book, you can ignore it")
@@ -80,17 +73,19 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		if !errors.IsNotFound(err) {
 			return ctrl.Result{}, err
 		}
+		// TODO : Don't redeclare var names in same scope
 		// if no Deployment found , or found deployments are not owned by book, create one on the cluster
-		deploy := newDeployment(&book)
-		if err := r.Create(ctx, &deploy); err != nil {
+		newdeploy := newDeployment(&book)
+		if err := r.Create(ctx, &newdeploy); err != nil {
 			log.Error(err, "Unable to create deployment")
 			return ctrl.Result{}, client.IgnoreNotFound(err)
 		}
-		fmt.Println("Created deployment successfully")
+		fmt.Printf("\nCreated deployment successfully\n")
 	} else {
 		// update deployment status if exist
-		if deploy.Spec.Replicas != book.Spec.Replicas {
-			deploy.Spec.Replicas = book.Spec.Replicas
+		if *deploy.Spec.Replicas != *book.Spec.Replicas {
+			//fmt.Printf("%d got replica, %d need replica\n", *deploy.Spec.Replicas, *book.Spec.Replicas)
+			*deploy.Spec.Replicas = *book.Spec.Replicas
 			if err := r.Update(ctx, &deploy); err != nil {
 				log.Error(err, "Unable to update deployment")
 				return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -119,6 +114,7 @@ func (r *BookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 		fmt.Println("Created Service successfully")
 	}
+	// Add a field in book.Status to hold info about svc creation
 
 	fmt.Println("Reconcile done----------------------")
 	return ctrl.Result{}, nil

@@ -17,6 +17,8 @@ func newDeployment(resource *crdappsv1.Book) appsv1.Deployment {
 		"controller": resource.Name,
 	}
 	return appsv1.Deployment{
+		// TODO : Check if the required fields are empty or not
+		// TODO: Owner Ref
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      resource.Spec.DeploymentName,
 			Namespace: resource.Namespace,
@@ -28,7 +30,7 @@ func newDeployment(resource *crdappsv1.Book) appsv1.Deployment {
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: labels,
+					Labels: labels, // Label for the pod
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{

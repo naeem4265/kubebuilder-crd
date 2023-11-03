@@ -1,13 +1,13 @@
 apiVersion: apps.naeem4265.com/v1
 kind: Book
 metadata:
-  name: book-sample
+  name: example-book
 spec:
   container:
-    image: naeem4265/api-server:1.0.4
+    image: "naeem4265/api-server:1.0.4"
     port: 8080
-  deploymentName: "my-book"
-  replicas: 3
+  deploymentName: book-deployment
+  replicas: 4
   service:
-    name: "book-service"
+    name: book-service
     servicePort: 8080
